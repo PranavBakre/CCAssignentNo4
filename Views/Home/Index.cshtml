@@ -1,0 +1,50 @@
+﻿@{
+ViewData["Title"] = "Home Page";
+}
+@model AssignmentNo4.ViewModels.IndexModel
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    <form method="post" enctype="multipart/form-data" action="/Home/Submit">
+
+        <div>
+            <p>
+                <select name="containerName" onchange="getContainerFiles(event)">
+                    @foreach (var container in Model.Containers)
+                    {
+                    <option>@container.Name</option>
+                    }
+
+                </select>
+        </div>
+        <div>
+            <input name="file" type="file">
+        </div>
+        <input type="submit">
+    </form>
+    <div id="files"></div>
+</div>
+@section Scripts {
+<script>
+    async function getContainerFiles(event) {
+        let response = await fetch(`/Home/GetContainerFiles?${event.target.name}=${event.target.value}`)
+            .then(response => response.json());
+        console.log(response)
+        let list = document.createElement("ul");
+
+        for (let li of response) {
+            let listItem = document.createElement("li");
+            let anchor = document.createElement("a");
+            anchor.setAttribute("href",`/Home/DeleteFile?containerName=${event.target.value}&fileName=${li.name}`)
+            anchor.append(li.name);
+            listItem.append(anchor);
+            list.appendChild(listItem);
+        }
+        let files = document.getElementById("files");
+        files.innerHTML="";
+        files.appendChild(list);
+    }
+
+</script>
+}
